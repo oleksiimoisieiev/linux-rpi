@@ -178,10 +178,11 @@ int __pci_read_base(struct pci_dev *dev, enum pci_bar_type type,
 {
 	u32 l = 0, sz = 0, mask;
 	u64 l64, sz64, mask64;
+	u16 val;
 	u16 orig_cmd;
 	struct pci_bus_region region, inverted_region;
 
-	mask = type ? PCI_ROM_ADDRESS_MASK : ~0;
+	mask = ~0;
 
 	/* No printks while decoding is disabled! */
 	if (!dev->mmio_always_on) {
@@ -193,6 +194,11 @@ int __pci_read_base(struct pci_dev *dev, enum pci_bar_type type,
 	}
 
 	res->name = pci_name(dev);
+
+	pci_read_config_word(dev, PCI_COMMAND, &val);
+	printk("=== %s %d cmd=%x\n", __func__, __LINE__, val);
+	pci_read_config_word(dev, PCI_STATUS, &val);
+	printk("=== %s %d status=%x\n", __func__, __LINE__, val);
 
 	pci_read_config_dword(dev, pos, &l);
 	pci_write_config_dword(dev, pos, l | mask);
@@ -217,6 +223,7 @@ int __pci_read_base(struct pci_dev *dev, enum pci_bar_type type,
 
 	if (type == pci_bar_unknown) {
 		res->flags = decode_bar(dev, l);
+		printk("=== %s %d l=%x\n", __func__, __LINE__, l);
 		res->flags |= IORESOURCE_SIZEALIGN;
 		if (res->flags & IORESOURCE_IO) {
 			l64 = l & PCI_BASE_ADDRESS_IO_MASK;
@@ -233,6 +240,7 @@ int __pci_read_base(struct pci_dev *dev, enum pci_bar_type type,
 		l64 = l & PCI_ROM_ADDRESS_MASK;
 		sz64 = sz & PCI_ROM_ADDRESS_MASK;
 		mask64 = PCI_ROM_ADDRESS_MASK;
+		printk("=== %s %d l=%x\n", __func__, __LINE__, l);
 	}
 
 	if (res->flags & IORESOURCE_MEM_64) {
@@ -282,6 +290,7 @@ int __pci_read_base(struct pci_dev *dev, enum pci_bar_type type,
 	}
 
 	region.start = l64;
+	printk("=== %s %d region.start=%llx\n", __func__, __LINE__, region.start);
 	region.end = l64 + sz64 - 1;
 
 	pcibios_bus_to_resource(dev->bus, res, &region);
@@ -312,6 +321,8 @@ int __pci_read_base(struct pci_dev *dev, enum pci_bar_type type,
 fail:
 	res->flags = 0;
 out:
+	printk("=== %s %d\n", __func__, __LINE__);
+
 	if (res->flags)
 		pci_info(dev, "reg 0x%x: %pR\n", pos, res);
 
@@ -331,6 +342,7 @@ static void pci_read_bases(struct pci_dev *dev, unsigned int howmany, int rom)
 
 	for (pos = 0; pos < howmany; pos++) {
 		struct resource *res = &dev->resource[pos];
+		printk("=== %s %d res->start=%llx\n", __func__, __LINE__, res->start);
 		reg = PCI_BASE_ADDRESS_0 + (pos << 2);
 		pos += __pci_read_base(dev, pci_bar_unknown, res, reg);
 	}
