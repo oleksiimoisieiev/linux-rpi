@@ -2361,6 +2361,9 @@ static int rp1_clk_probe(struct platform_device *pdev)
 	spin_lock_init(&clockman->regs_lock);
 	clockman->dev = dev;
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+	for (i = 0; i < pdev->num_resources; i++) {
+		printk("=== %s %d res=%pR\n", __func__, __LINE__, &(pdev->resource[i]));
+	}
 	clockman->regs = devm_ioremap_resource(&pdev->dev, res);
 	if (IS_ERR(clockman->regs))
 		return PTR_ERR(clockman->regs);
