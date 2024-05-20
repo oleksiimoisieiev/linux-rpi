@@ -935,6 +935,7 @@ static void __iomem *brcm_pcie_map_bus(struct pci_bus *bus,
 	/* For devices, write to the config space index register */
 	idx = PCIE_ECAM_OFFSET(bus->number, devfn, 0);
 	writel(idx, pcie->base + PCIE_EXT_CFG_INDEX);
+	printk("=== %s %d off = %x", __func__, __LINE__, PCIE_EXT_CFG_DATA + PCIE_ECAM_REG(where));
 	return base + PCIE_EXT_CFG_DATA + PCIE_ECAM_REG(where);
 }
 
