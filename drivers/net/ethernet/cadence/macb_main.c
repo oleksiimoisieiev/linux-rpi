@@ -4,7 +4,8 @@
  *
  * Copyright (C) 2004-2006 Atmel Corporation
  */
-
+#define DEBUG 1
+#define VERBOSE_DEBUG 1
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 #include <linux/clk.h>
 #include <linux/clk-provider.h>
@@ -2424,6 +2425,12 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
 	spin_unlock_irq(&bp->lock);
+
+	printk("=== %s %d NSR = %x  TSR = %x RSR = %x, ctrl = %x status = "
+	       "%x\n",
+	       __func__, __LINE__, macb_readl(bp, NSR), macb_readl(bp, TSR),
+	       macb_readl(bp, RSR), readl(bp->regs + 0x4000),
+	       readl(bp->regs + 0x4004));
 
 	if (CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size) < 1)
 		netif_stop_subqueue(dev, queue_index);
