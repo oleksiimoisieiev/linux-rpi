@@ -330,9 +330,9 @@ static int rp1_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		irq_set_chained_handler(pci_irq_vector(pdev, i),
 					rp1_chained_handle_irq);
 	}
-
+//	printk("=== %s %d name = %s\n", __func__, __LINE__, pci.dev->kobj.name);
 	if (rp1_node)
-		of_platform_populate(rp1_node, NULL, NULL, &pcie_pdev->dev);
+		of_platform_populate(rp1_node, NULL, NULL, rp1->dev->parent);
 
 	of_node_put(rp1_node);
 
