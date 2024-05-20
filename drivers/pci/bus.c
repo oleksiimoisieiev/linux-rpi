@@ -188,6 +188,7 @@ static int pci_bus_alloc_from_region(struct pci_bus *bus, struct resource *res,
 	int ret;
 
 	type_mask |= IORESOURCE_TYPE_BITS;
+	printk("=== %s %d\n", __func__, __LINE__);
 
 	pci_bus_for_each_resource(bus, r) {
 		resource_size_t min_used = min;
@@ -207,6 +208,7 @@ static int pci_bus_alloc_from_region(struct pci_bus *bus, struct resource *res,
 
 		avail = *r;
 		pci_clip_resource_to_region(bus, &avail, region);
+		printk("=== %s %d avail->start = %x\n", __func__, __LINE__, avail.start);
 
 		/*
 		 * "min" is typically PCIBIOS_MIN_IO or PCIBIOS_MIN_MEM to
