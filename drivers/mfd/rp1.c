@@ -292,9 +292,7 @@ static int rp1_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	rp1->bar_end = pci_resource_end(pdev, 1);
 	printk("=== %s %d name = %s\n", __func__, __LINE__, dev_name(rp1->dev));
 	printk("=== %s %d name = %s\n", __func__, __LINE__, dev_name(rp1->dev->parent));
-	printk("=== %s %d name = %s\n", __func__, __LINE__, dev_name(rp1->dev->parent->parent));
-	printk("=== %s %d name = %s\n", __func__, __LINE__, dev_name(rp1->dev->parent->parent->parent));
-	// Get chip id
+	/// Get chip id
 	g_chip_id = rp1_reg_read(rp1, RP1_SYSINFO_BASE, SYSINFO_CHIP_ID_OFFSET);
 	g_platform = rp1_reg_read(rp1, RP1_SYSINFO_BASE, SYSINFO_PLATFORM_OFFSET);
 	dev_info(&pdev->dev, "chip_id 0x%x%s\n", g_chip_id,
@@ -310,10 +308,9 @@ static int rp1_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		return -EINVAL;
 	}
 
-	pcie_pdev = of_find_device_by_node(rp1_node->parent->parent);
+	pcie_pdev = of_find_device_by_node(rp1_node->parent);
 	printk("=== %s %d name = %s\n", __func__, __LINE__, dev_name(&pcie_pdev->dev));
 	printk("=== %s %d name = %s\n", __func__, __LINE__, dev_name(pcie_pdev->dev.parent));
-	printk("=== %s %d name = %s\n", __func__, __LINE__, dev_name(pcie_pdev->dev.parent->parent));
 	rp1->domain = irq_domain_add_linear(rp1_node, RP1_IRQS,
 					    &rp1_domain_ops, rp1);
 
