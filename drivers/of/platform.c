@@ -6,7 +6,7 @@
  *    Merged from powerpc/kernel/of_platform.c and
  *    sparc{,64}/kernel/of_device.c by Stephen Rothwell
  */
-
+#define DEBUG 1
 #define pr_fmt(fmt)	"OF: " fmt
 
 #include <linux/errno.h>
