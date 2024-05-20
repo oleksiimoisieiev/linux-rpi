@@ -3,14 +3,20 @@
 #include <dt-bindings/mfd/rp1.h>
 
 &rp1_target {
+			pcie@0,0 {
+				reg = <0x0 0x0 0x0 0x0 0x0>;
+				compatible = "pci-bridge";
+				ranges = <>;
+				dma-ranges = <>;
 	rp1: rp1 {
-		compatible = "simple-bus";
+		compatible = "raspberrypi,rp1-mfd";
+		reg = <0x0 0x0 0x0 0x0 0x0>;
 		#address-cells = <2>;
 		#size-cells = <2>;
 		#interrupt-cells = <2>;
 		interrupt-controller;
 		interrupt-parent = <&rp1>;
-
+		pci,no-autoconfig;
 		// ranges and dma-ranges must be provided by the includer
 
 		rp1_clocks: clocks@18000 {
@@ -1188,6 +1194,7 @@
 			assigned-clock-parents = <&rp1_clocks RP1_PLL_VIDEO>;
 		};
 	};
+		};
 };
 
 &clocks {
