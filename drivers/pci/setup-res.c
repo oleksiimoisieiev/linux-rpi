@@ -30,6 +30,7 @@ static void pci_std_update_resource(struct pci_dev *dev, int resno)
 	u32 new, check, mask;
 	int reg;
 	struct resource *res = dev->resource + resno;
+	printk("=== %s %d\n", __func__, __LINE__);
 
 	/* Per SR-IOV spec 3.4.1.11, VF BARs are RO zero */
 	if (dev->is_virtfn)
@@ -136,7 +137,7 @@ int pci_claim_resource(struct pci_dev *dev, int resource)
 {
 	struct resource *res = &dev->resource[resource];
 	struct resource *root, *conflict;
-
+	printk("=== %s %d r-name\n", __func__, __LINE__);
 	if (res->flags & IORESOURCE_UNSET) {
 		pci_info(dev, "can't claim BAR %d %pR: no address assigned\n",
 			 resource, res);
@@ -264,8 +265,10 @@ static int __pci_assign_resource(struct pci_bus *bus, struct pci_dev *dev,
 	struct resource *res = dev->resource + resno;
 	resource_size_t min;
 	int ret;
-
+	printk("=== %s %d resno= %d size = %llx align = %llx\n", __func__, __LINE__, resno, size, align);
 	min = (res->flags & IORESOURCE_IO) ? PCIBIOS_MIN_IO : PCIBIOS_MIN_MEM;
+	printk("=== %s %d res->start = %llx, res->end=%llx\n",
+				__func__, __LINE__, res->start, res->end);
 
 	/*
 	 * First, try exact prefetching match.  Even if a 64-bit
@@ -280,6 +283,9 @@ static int __pci_assign_resource(struct pci_bus *bus, struct pci_dev *dev,
 	if (ret == 0)
 		return 0;
 
+	printk("=== %s %d res->start = %llx, res->end=%llx\n",
+			__func__, __LINE__, res->start, res->end);
+
 	/*
 	 * If the prefetchable window is only 32 bits wide, we can put
 	 * 64-bit prefetchable resources in it.
@@ -292,6 +298,7 @@ static int __pci_assign_resource(struct pci_bus *bus, struct pci_dev *dev,
 		if (ret == 0)
 			return 0;
 	}
+	printk("=== %s %d \n", __func__, __LINE__);
 
 	/*
 	 * If we didn't find a better match, we can put any memory resource
@@ -302,6 +309,9 @@ static int __pci_assign_resource(struct pci_bus *bus, struct pci_dev *dev,
 	if (res->flags & (IORESOURCE_PREFETCH | IORESOURCE_MEM_64))
 		ret = pci_bus_alloc_resource(bus, res, size, align, min, 0,
 					     pcibios_align_resource, dev);
+	printk("=== %s %d r-\n", __func__, __LINE__);
+	printk("=== %s %d res->start = %llx, res->end=%llx\n",
+				__func__, __LINE__, res->start, res->end);
 
 	return ret;
 }
@@ -311,7 +321,7 @@ static int _pci_assign_resource(struct pci_dev *dev, int resno,
 {
 	struct pci_bus *bus;
 	int ret;
-
+	printk("=== %s %d r-nam\n", __func__, __LINE__);
 	bus = dev->bus;
 	while ((ret = __pci_assign_resource(bus, dev, resno, size, min_align))) {
 		if (!bus->parent || !bus->self->transparent)
@@ -480,13 +490,17 @@ int pci_enable_resources(struct pci_dev *dev, int mask)
 	u16 cmd, old_cmd;
 	int i;
 	struct resource *r;
-
+	printk("=== %s %d drv = %p\n", __func__, __LINE__, dev->driver);
 	pci_read_config_word(dev, PCI_COMMAND, &cmd);
 	old_cmd = cmd;
 
 	pci_dev_for_each_resource(dev, r, i) {
 		if (!(mask & (1 << i)))
 			continue;
+		printk("=== %s %d r-name = %s\n", __func__, __LINE__,
+		       r->name);
+		printk("=== %s %d r-start = %llx end = %llx parent = %p\n", __func__, __LINE__,
+		       r->start, r->end, r->parent);
 
 		if (!(r->flags & (IORESOURCE_IO | IORESOURCE_MEM)))
 			continue;
